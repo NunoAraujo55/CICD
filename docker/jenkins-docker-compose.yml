@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: jenkins/jenkins:lts-jdk17
+    container_name: lms-jenkins-mvn
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - ../webapps:/usr/local/tomcat/webapps
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  jenkins_home:

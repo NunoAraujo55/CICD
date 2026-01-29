@@ -1,0 +1,15 @@
+services:
+  app:
+    image: nunoaraujo12/demo-psoft:${IMAGE_TAG}
+    container_name: demo-psoft-${ENV}
+    restart: always
+
+    ports:
+      - "${APP_PORT}:8080"
+
+    networks:
+      - lms_network
+
+networks:
+  lms_network:
+    external: true

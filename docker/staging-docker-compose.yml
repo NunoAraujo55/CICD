@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  tomcat:
+    image: tomcat:10.1-jdk17  # Tomcat 10.1 with Java 17
+    container_name: lms-staging
+    ports:
+      - "9000:8080"
+    volumes:
+      - ./webapps:/usr/local/tomcat/webapps
+    environment:
+      - JAVA_OPTS=-Xms512m -Xmx1024m

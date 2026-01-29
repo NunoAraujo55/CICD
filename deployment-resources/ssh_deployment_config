@@ -1,0 +1,13 @@
+Host production
+    HostName 141.227.165.116
+    Port 22
+    User debian
+    IdentityFile deployment-resources/id_rsa_custom
+    ForwardAgent yes
+
+Host staging
+    HostName 141.227.165.116
+    Port 22
+    User debian
+    IdentityFile deployment-resources/id_rsa_custom
+    ForwardAgent yes

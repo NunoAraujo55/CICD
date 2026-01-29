@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # --- O PROXY (Caddy) ---
+  caddy:
+    image: lucaslorentz/caddy-docker-proxy:ci-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - lms_network_overlay
+    environment:
+      - CADDY_INGRESS_NETWORKS=lms_network_overlay
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - caddy_data:/data
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      replicas: 1
+
+  lms_genre_query:
+    image: nunoaraujo12/demo-psoft:${IMAGE_TAG}
+    environment:
+      - SPRING_PROFILES_ACTIVE=sql
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/lms
+      - SPRING_DATASOURCE_USERNAME=lms
+      - SPRING_DATASOURCE_PASSWORD=lms
+      - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.MySQLDialect
+    deploy:
+      labels:
+        caddy: "http://141.227.165.115"
+        caddy.reverse_proxy: "{{upstreams 8080}}"
+      replicas: 1
+    networks:
+      - lms_network_overlay
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - lms_network_overlay
+    deploy:
+      replicas: 1
+
+  # --- INFRASTRUCTURE ---
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_DATABASE: lms
+      MYSQL_USER: lms
+      MYSQL_PASSWORD: lms
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - lms_network_overlay
+    deploy:
+      replicas: 1
+
+volumes:
+  caddy_data:
+
+networks:
+  lms_network_overlay:
+    driver: overlay
+    external: true
